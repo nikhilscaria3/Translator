@@ -4,6 +4,8 @@ import { franc } from "franc";
 import { faCopy, faXmarkCircle } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMicrophone, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
+import axios from "../utils/baseapi"
+
 
 const languages = [
   { code: "af", name: "Afrikaans" },
@@ -93,12 +95,10 @@ function App() {
     try {
       setLoading(true);
       const sourceLanguage = franc(inputText);
-      const response = await fetch("http://localhost:5000/translate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ text: inputText, sourceLanguage, targetLanguage }),
+      const response = await axios.post("/translate", {
+        text: inputText,
+        sourceLanguage,
+        targetLanguage,
       });
 
       if (response.ok) {

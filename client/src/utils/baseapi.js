@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create a new Axios instance with your custom configuration
 const instance = axios.create({
-  baseURL: 'http://localhost:5000', // Set your base URL here
+  baseURL: 'https://translator-6r38.vercel.app', // Set your base URL here
 
 });
 
