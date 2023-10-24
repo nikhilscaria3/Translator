@@ -1,24 +1,139 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "./App.css";
+import { franc } from "franc";
+import { faCopy, faXmarkCircle } from "@fortawesome/free-regular-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMicrophone, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
+
+const languages = [
+  { code: "af", name: "Afrikaans" },
+  { code: "sq", name: "Albanian" },
+  { code: "am", name: "Amharic" },
+  { code: "ar", name: "Arabic" },
+  { code: "hy", name: "Armenian" },
+  { code: "az", name: "Azerbaijani" },
+  { code: "eu", name: "Basque" },
+  { code: "be", name: "Belarusian" },
+  { code: "bn", name: "Bengali" },
+  { code: "bs", name: "Bosnian" },
+  { code: "bg", name: "Bulgarian" },
+  { code: "ca", name: "Catalan" },
+  { code: "ceb", name: "Cebuano" },
+  { code: "ny", name: "Chichewa" },
+  { code: "zh-CN", name: "Chinese (Simplified)" },
+  { code: "zh-TW", name: "Chinese (Traditional)" },
+  { code: "co", name: "Corsican" },
+  { code: "hr", name: "Croatian" },
+  { code: "cs", name: "Czech" },
+  { code: "da", name: "Danish" },
+  { code: "nl", name: "Dutch" },
+  { code: "en", name: "English" },
+  { code: "eo", name: "Esperanto" },
+  { code: "et", name: "Estonian" },
+  { code: "tl", name: "Filipino" },
+  { code: "fi", name: "Finnish" },
+  { code: "fr", name: "French" },
+  { code: "fy", name: "Frisian" },
+  { code: "gl", name: "Galician" },
+  { code: "ml", name: "Malayalam" },
+];
+
 
 function App() {
   const [text, setText] = useState("");
   const [translatedText, setTranslatedText] = useState("");
-  const [targetLanguage, setTargetLanguage] = useState("es"); // Default: Spanish
+  const [targetLanguage, setTargetLanguage] = useState("es");
+  const [isCopied, setIsCopied] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const textareaRef = useRef();
 
-  const handleTranslate = async () => {
+  useEffect(() => {
+    // Load translation history from localStorage
+    const translationHistory = JSON.parse(localStorage.getItem("translationHistory")) || [];
+    const lastTranslation = translationHistory[translationHistory.length - 1];
+
+    if (lastTranslation) {
+      setText(lastTranslation.text);
+      setTranslatedText(lastTranslation.translatedText);
+      setTargetLanguage(lastTranslation.targetLanguage);
+    }
+  }, []);
+
+  const speakText = (text) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const recognition = new window.webkitSpeechRecognition();
+  const synth = window.speechSynthesis;
+
+  if (!recognition || !synth) {
+    console.error("Speech recognition or synthesis is not supported in this browser.");
+  }
+
+  const startSpeechRecognition = () => {
+    setIsRecording(true);
+    textareaRef.current.focus();
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setText(transcript);
+      handleTranslate(transcript, true);
+    };
+
+    recognition.onend = () => {
+      setIsRecording(false);
+    };
+
+    recognition.start();
+  };
+
+  const handleTranslate = async (inputText, isVoiceInput = false) => {
     try {
+      setLoading(true);
+      const sourceLanguage = franc(inputText);
       const response = await fetch("http://localhost:5000/translate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text, targetLanguage }),
+        body: JSON.stringify({ text: inputText, sourceLanguage, targetLanguage }),
       });
-      const data = await response.json();
-      setTranslatedText(data.translatedText);
+
+      if (response.ok) {
+        const data = await response.json();
+        setTranslatedText(data.translatedText);
+        setIsCopied(false);
+
+        if (!isVoiceInput) {
+          const translationHistory = JSON.parse(localStorage.getItem("translationHistory")) || [];
+          const newTranslation = {
+            text: inputText,
+            translatedText: data.translatedText,
+            sourceLanguage,
+            targetLanguage,
+            timestamp: new Date().toISOString(),
+          };
+          localStorage.setItem("translationHistory", JSON.stringify([...translationHistory, newTranslation]));
+        }
+      } else {
+        throw new Error("Translation failed. Please try again.");
+      }
     } catch (error) {
       console.error(error);
+      setTranslatedText("Translation failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(translatedText);
+      setIsCopied(true);
+    } catch (error) {
+      console.error("Failed to copy text: ", error);
     }
   };
 
@@ -30,10 +145,33 @@ function App() {
           <div className="input-group mb-3">
             <textarea
               className="form-control"
-              placeholder="Enter text to translate"
+              placeholder="Speak or type text to translate"
               value={text}
               onChange={(e) => setText(e.target.value)}
+              rows={5}
+              ref={textareaRef}
             />
+            <button
+              className={`btn btn-primary ${isRecording ? "recording" : ""}`}
+              onClick={startSpeechRecognition}
+            >
+              <FontAwesomeIcon icon={faMicrophone} className="me-2" />
+              {isRecording ? "Recording..." : ""}
+            </button>
+          </div>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <span>Character Count: {text.length}</span>
+            <button
+              className="btn btn-secondary"
+              onClick={() => {
+                if (window.confirm("Are you sure you want to clear the text?")) {
+                  setText("");
+                  setTranslatedText("");
+                }
+              }}
+            >
+              <FontAwesomeIcon icon={faXmarkCircle} className="me-2" /> Clear
+            </button>
           </div>
           <div className="input-group mb-3">
             <select
@@ -41,18 +179,32 @@ function App() {
               value={targetLanguage}
               onChange={(e) => setTargetLanguage(e.target.value)}
             >
-              <option value="es">Spanish</option>
-              <option value="fr">French</option>
-              {/* Add more language options as needed */}
+              {languages?.map((lang) => (
+                <option key={lang.code} value={lang.code}>
+                  {lang.name}
+                </option>
+              ))}
             </select>
-            <button className="btn btn-primary" onClick={handleTranslate}>
+            <button className="btn btn-primary" onClick={() => handleTranslate(text)}>
               Translate
             </button>
           </div>
+          {loading && <div className="alert alert-info">Translating...</div>}
           {translatedText && (
             <div className="alert alert-success" role="alert">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <button className="btn btn-info" onClick={() => speakText(translatedText)}>
+                  <FontAwesomeIcon icon={faVolumeUp} className="me-2" />
+                  Speak
+                </button>
+                <button className="btn btn-success" onClick={handleCopy}>
+                  <FontAwesomeIcon icon={faCopy} className="me-2" />
+                  Copy
+                </button>
+              </div>
               <h2 className="mb-3">Translation:</h2>
               <p>{translatedText}</p>
+              {isCopied && <span className="ms-2 text-success">Copied!</span>}
             </div>
           )}
         </div>
