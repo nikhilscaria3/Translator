@@ -3,7 +3,19 @@ const cors = require("cors");
 const translate = require("translate-google");
 
 const app = express();
-app.use(cors());
+// app.use(cors());
+
+
+app.use(cors({
+
+  origin: ["https://translator-liard-nine.vercel.app/"],
+  methods: ["POST", "GET"],
+  credentials: true
+
+}
+))
+
+
 app.use(express.json());
 
 app.post("/translate", async (req, res) => {
