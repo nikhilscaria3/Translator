@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import "./App.css";
 import { franc } from "franc";
 import { faCopy, faXmarkCircle } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
