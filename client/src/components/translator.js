@@ -115,8 +115,6 @@ function App() {
           };
           localStorage.setItem("translationHistory", JSON.stringify([...translationHistory, newTranslation]));
         }
-      } else {
-        throw new Error("Translation failed. Please try again.");
       }
     } catch (error) {
       console.error(error);
