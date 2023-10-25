@@ -170,9 +170,6 @@ function TRANSLATOR() {
         }
     };
 
-    const handlenavigate = () => {
-        navigate('/pdf')
-    }
 
 
 
@@ -214,7 +211,7 @@ function TRANSLATOR() {
                     <a className="navbar-brand" href="/">
                         <h1 className='navbrand'>Transo</h1>
                     </a>
-                    <button className="navigatepdfbutton" onClick={handlenavigate}>Create PDF</button>
+                  
                 </div>
                 {/* ... Navigation bar content ... */}
             </nav>
