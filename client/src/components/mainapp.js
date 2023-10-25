@@ -95,7 +95,7 @@ function App() {
     try {
       setLoading(true);
       const sourceLanguage = franc(inputText);
-      const response = await axios.post("/translate", {
+      const response = await axios.post("https://translator-6r38.vercel.app/translate", {
         text: inputText,
         sourceLanguage,
         targetLanguage,
