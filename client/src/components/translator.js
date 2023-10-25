@@ -3,7 +3,7 @@ import { franc } from "franc";
 import { faCopy, faXmarkCircle } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMicrophone, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
-import axios from "../utils/baseapi"
+import axios from '../utils/baseapi'; // Import Axios
 
 const languages = [
   { code: "af", name: "Afrikaans" },
