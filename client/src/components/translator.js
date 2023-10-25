@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMicrophone, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 import axios from '../utils/baseapi'; // Import Axios
 import '../styles/translator.css'
+import { useNavigate } from "react-router-dom";
 const languages = [
     { code: "af", name: "Afrikaans" },
     { code: "sq", name: "Albanian" },
@@ -38,7 +39,7 @@ const languages = [
     { code: "ml", name: "Malayalam" },
 ];
 
-function App() {
+function TRANSLATOR() {
     const [text, setText] = useState("");
     const [translatedText, setTranslatedText] = useState("");
     const [targetLanguage, setTargetLanguage] = useState("es");
@@ -46,7 +47,7 @@ function App() {
     const [loading, setLoading] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
     const textareaRef = useRef();
-
+    const navigate = useNavigate()
     useEffect(() => {
         // Load translation history from localStorage
         const translationHistory = JSON.parse(localStorage.getItem("translationHistory")) || [];
@@ -135,6 +136,10 @@ function App() {
         }
     };
 
+    const handlenavigate = () => {
+        navigate('/pdf')
+    }
+
     return (
         <div className="container mt-5">
             <nav className="navbar navbar-expand-lg navbar-light ">
@@ -142,7 +147,7 @@ function App() {
                     <a className="navbar-brand" href="/">
                         <h1 className='navbrand'>Transo</h1>
                     </a>
-
+                    <button className="navigatepdfbutton" onClick={handlenavigate}>Create PDF</button>
                 </div>
                 {/* ... Navigation bar content ... */}
             </nav>
@@ -193,35 +198,35 @@ function App() {
                             ))}
                         </select>
                         <div className="bg-icon">
-                        <button className="btn btn-primary" onClick={() => handleTranslate(text)}>
-                            Translate
-                        </button>
-                        <span></span>
-                    </div>
-                 
-                </div>
-                {loading && <div className="alert alert-info">Translating...</div>}
-                {translatedText && (
-                    <div className="alert alert-success" role="alert">
-                        <div className="d-flex justify-content-between align-items-center mb-3">
-                            <button className="btn btn-info" onClick={() => speakText(translatedText)}>
-                                <FontAwesomeIcon icon={faVolumeUp} className="me-2" />
-                                Speak
+                            <button className="btn btn-primary" onClick={() => handleTranslate(text)}>
+                                Translate
                             </button>
-                            <button className="btn btn-success" onClick={handleCopy}>
-                                <FontAwesomeIcon icon={faCopy} className="me-2" />
-                                Copy
-                            </button>
+                            <span></span>
                         </div>
-                        <h2 className="mb-3">Translation:</h2>
-                        <p>{translatedText}</p>
-                        {isCopied && <span className="ms-2 text-success">Copied!</span>}
+
                     </div>
-                )}
+                    {loading && <div className="alert alert-info">Translating...</div>}
+                    {translatedText && (
+                        <div className="alert alert-success" role="alert">
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                                <button className="btn btn-info" onClick={() => speakText(translatedText)}>
+                                    <FontAwesomeIcon icon={faVolumeUp} className="me-2" />
+                                    Speak
+                                </button>
+                                <button className="btn btn-success" onClick={handleCopy}>
+                                    <FontAwesomeIcon icon={faCopy} className="me-2" />
+                                    Copy
+                                </button>
+                            </div>
+                            <h2 className="mb-3">Translation:</h2>
+                            <p>{translatedText}</p>
+                            {isCopied && <span className="ms-2 text-success">Copied!</span>}
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
         </div >
     );
 }
 
-export default App;
+export default TRANSLATOR;
