@@ -1,0 +1,15 @@
+
+.navbar-brand .navbrand {
+    background: linear-gradient(to right, #3498db, #a7a5a5, #3498db);
+    -webkit-background-clip: text;
+    color: transparent;
+    font-size: 36px;
+    font-weight: bold;
+    /* Add any other styles you want for the brand name */
+}
+
+.text-center {
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: 600;
+}
+
