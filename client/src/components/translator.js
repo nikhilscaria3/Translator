@@ -172,7 +172,7 @@ function TRANSLATOR() {
                         </button>
                     </div>
                     <div className="d-flex justify-content-between align-items-center mb-3">
-                        <span>Character Count: {text.length}</span>
+                        <span>Words: {text.length}</span>
                         <button
                             className="btn btn-secondary"
                             onClick={() => {
