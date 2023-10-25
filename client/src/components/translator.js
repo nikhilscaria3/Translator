@@ -151,7 +151,7 @@ function TRANSLATOR() {
                 </div>
                 {/* ... Navigation bar content ... */}
             </nav>
-            <h1 className="text-center mb-4">Translator App</h1>
+            <h1 className="text-center mb-4">Online Translator</h1>
             <div className="row">
                 <div className="col-md-6 offset-md-3">
                     <div className="input-group mb-3">
