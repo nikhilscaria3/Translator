@@ -2,10 +2,16 @@ import React, { useState, useRef, useEffect } from "react";
 import { franc } from "franc";
 import { faCopy, faXmarkCircle } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMicrophone, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
+import { faMicrophone, faVolumeUp,faVolumeOff } from "@fortawesome/free-solid-svg-icons";
 import axios from '../utils/baseapi'; // Import Axios
 import '../styles/translator.css'
 import { useNavigate } from "react-router-dom";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import '../styles/PDFMaker.css';
+
+
+
 const languages = [
     { code: "af", name: "Afrikaans" },
     { code: "sq", name: "Albanian" },
@@ -45,9 +51,22 @@ function TRANSLATOR() {
     const [targetLanguage, setTargetLanguage] = useState("es");
     const [isCopied, setIsCopied] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [isSpeaking, setIsSpeaking] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
     const textareaRef = useRef();
     const navigate = useNavigate()
+    const [editorHtml, setEditorHtml] = useState(() => {
+        const storedContent = localStorage.getItem('editorContent');
+        return storedContent ? storedContent : '';
+    });
+    const quillRef = useRef(null);
+
+    useEffect(() => {
+        if (quillRef.current) {
+            quillRef.current.getEditor().root.innerHTML = translatedText;
+        }
+    }, [translatedText]);
+
     useEffect(() => {
         // Load translation history from localStorage
         const translationHistory = JSON.parse(localStorage.getItem("translationHistory")) || [];
@@ -60,10 +79,17 @@ function TRANSLATOR() {
         }
     }, []);
 
+    
+
     const speakText = (text) => {
         const utterance = new SpeechSynthesisUtterance(text);
         window.speechSynthesis.speak(utterance);
+        utterance.onend = () => {
+            setIsSpeaking(false);
+        };
+        setIsSpeaking(true);
     };
+
 
     const recognition = new window.webkitSpeechRecognition();
     const synth = window.speechSynthesis;
@@ -71,6 +97,14 @@ function TRANSLATOR() {
     if (!recognition || !synth) {
         console.error("Speech recognition or synthesis is not supported in this browser.");
     }
+
+
+    const stopSpeaking = () => {
+        window.speechSynthesis.cancel();
+        setIsSpeaking(false);
+    };
+
+
 
     const startSpeechRecognition = () => {
         setIsRecording(true);
@@ -140,6 +174,39 @@ function TRANSLATOR() {
         navigate('/pdf')
     }
 
+
+
+    const handleQuillChange = () => {
+        if (quillRef.current) {
+            setEditorHtml(quillRef.current.getEditor().root.innerHTML);
+        }
+    };
+
+    // Save editor content to local storage whenever it changes
+    useEffect(() => {
+        localStorage.setItem('editorContent', editorHtml);
+    }, [editorHtml]);
+
+
+
+    const handlePrintPDF = () => {
+        const printWindow = window.open('', '', 'width=600,height=600');
+        printWindow.document.open();
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>PDF Output</title>
+              <link rel="stylesheet" href="path/to/your/print-styles.css" type="text/css" media="print">
+            </head>
+            <body>
+              ${editorHtml}
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+    };
+
     return (
         <div className="container mt-1">
             <nav className="navbar navbar-expand-lg navbar-light ">
@@ -206,6 +273,7 @@ function TRANSLATOR() {
 
                     </div>
                     {loading && <div className="alert alert-info">Translating...</div>}
+
                     {translatedText && (
                         <div className="alert alert-success" role="alert">
                             <div className="d-flex justify-content-between align-items-center mb-3">
@@ -213,16 +281,33 @@ function TRANSLATOR() {
                                     <FontAwesomeIcon icon={faVolumeUp} className="me-2" />
                                     Speak
                                 </button>
+                                {isSpeaking && (
+                                    <button className="btn btn-danger" onClick={stopSpeaking}>
+                                        <FontAwesomeIcon icon={faVolumeOff} className="me-2" />
+                                        Stop
+                                    </button>
+                                )}
                                 <button className="btn btn-success" onClick={handleCopy}>
                                     <FontAwesomeIcon icon={faCopy} className="me-2" />
                                     Copy
                                 </button>
                             </div>
                             <h2 className="mb-3">Translation:</h2>
-                            <p>{translatedText}</p>
+                            <div className="editor-container">
+                                <ReactQuill
+                                    ref={quillRef}
+                                    value={editorHtml}
+                                    onChange={handleQuillChange}
+                                    placeholder="Enter text here..."
+                                />
+                            </div>
                             {isCopied && <span className="ms-2 text-success">Copied!</span>}
                         </div>
+
                     )}
+                    <div className="text-center mt-4">
+                        <button className="btn btn-primary" onClick={handlePrintPDF}>Print as PDF</button>
+                    </div>
                 </div>
             </div>
         </div >
