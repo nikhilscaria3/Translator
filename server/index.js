@@ -8,7 +8,7 @@ const app = express();
 
 app.use(cors({
 
-  origin: ["https://translator-liard-nine.vercel.app/"],
+  origin: ["https://translator-liard-nine.vercel.app"],
   methods: ["POST", "GET"],
   credentials: true
 
