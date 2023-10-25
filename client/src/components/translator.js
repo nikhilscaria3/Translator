@@ -211,7 +211,7 @@ function TRANSLATOR() {
                     <a className="navbar-brand" href="/">
                         <h1 className='navbrand'>Transo</h1>
                     </a>
-                  
+
                 </div>
                 {/* ... Navigation bar content ... */}
             </nav>
@@ -274,16 +274,17 @@ function TRANSLATOR() {
                     {translatedText && (
                         <div className="alert alert-success" role="alert">
                             <div className="d-flex justify-content-between align-items-center mb-3">
-                                <button className="btn btn-info" onClick={() => speakText(translatedText)}>
-                                    <FontAwesomeIcon icon={faVolumeUp} className="me-2" />
-                                    Speak
+                                {isSpeaking ? <button className="btn btn-danger" onClick={stopSpeaking}>
+                                    <FontAwesomeIcon icon={faVolumeOff} className="me-2" />
+                                    Stop
                                 </button>
-                                {isSpeaking && (
-                                    <button className="btn btn-danger" onClick={stopSpeaking}>
-                                        <FontAwesomeIcon icon={faVolumeOff} className="me-2" />
-                                        Stop
+                                    :
+
+                                    <button className="btn btn-info" onClick={() => speakText(translatedText)}>
+                                        <FontAwesomeIcon icon={faVolumeUp} className="me-2" />
+                                        Speak
                                     </button>
-                                )}
+                                }
                                 <button className="btn btn-success" onClick={handleCopy}>
                                     <FontAwesomeIcon icon={faCopy} className="me-2" />
                                     {isCopied ? 'Copied!' : 'Copy'}
