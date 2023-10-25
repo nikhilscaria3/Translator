@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { franc } from "franc";
 import { faCopy, faXmarkCircle } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMicrophone, faVolumeUp,faVolumeOff } from "@fortawesome/free-solid-svg-icons";
+import { faMicrophone, faVolumeUp, faVolumeOff } from "@fortawesome/free-solid-svg-icons";
 import axios from '../utils/baseapi'; // Import Axios
 import '../styles/translator.css'
 import { useNavigate } from "react-router-dom";
@@ -79,7 +79,7 @@ function TRANSLATOR() {
         }
     }, []);
 
-    
+
 
     const speakText = (text) => {
         const utterance = new SpeechSynthesisUtterance(text);
@@ -289,8 +289,9 @@ function TRANSLATOR() {
                                 )}
                                 <button className="btn btn-success" onClick={handleCopy}>
                                     <FontAwesomeIcon icon={faCopy} className="me-2" />
-                                    Copy
+                                    {isCopied ? 'Copied!' : 'Copy'}
                                 </button>
+
                             </div>
                             <h2 className="mb-3">Translation:</h2>
                             <div className="editor-container">
@@ -301,13 +302,13 @@ function TRANSLATOR() {
                                     placeholder="Enter text here..."
                                 />
                             </div>
-                            {isCopied && <span className="ms-2 text-success">Copied!</span>}
+                            <div className="text-center mt-4">
+                                <button className="btn btn-primary" onClick={handlePrintPDF}>Print as PDF</button>
+                            </div>
                         </div>
 
                     )}
-                    <div className="text-center mt-4">
-                        <button className="btn btn-primary" onClick={handlePrintPDF}>Print as PDF</button>
-                    </div>
+
                 </div>
             </div>
         </div >
