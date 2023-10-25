@@ -100,7 +100,7 @@ function App() {
       });
 
       if (response.status >= 200 && response.status < 300) {
-        const data = await response.json();
+        const data = await response.data;
         setTranslatedText(data.translatedText);
         setIsCopied(false);
 
