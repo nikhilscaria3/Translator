@@ -141,7 +141,7 @@ function TRANSLATOR() {
     }
 
     return (
-        <div className="container mt-5">
+        <div className="container mt-1">
             <nav className="navbar navbar-expand-lg navbar-light ">
                 <div className="container-fluid">
                     <a className="navbar-brand" href="/">
