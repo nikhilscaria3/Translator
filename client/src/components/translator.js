@@ -99,7 +99,7 @@ function App() {
         targetLanguage,
       });
 
-      if (response.ok) {
+      if (response.status >= 200 && response.status < 300) {
         const data = await response.json();
         setTranslatedText(data.translatedText);
         setIsCopied(false);
@@ -115,9 +115,7 @@ function App() {
           };
           localStorage.setItem("translationHistory", JSON.stringify([...translationHistory, newTranslation]));
         }
-      } else {
-        throw new Error("Translation failed. Please try again.");
-      }
+      } 
     } catch (error) {
       console.error(error);
       setTranslatedText("Translation failed. Please try again.");
