@@ -43,7 +43,9 @@ const languages = [
     { code: "fy", name: "Frisian" },
     { code: "gl", name: "Galician" },
     { code: "ml", name: "Malayalam" },
+    { code: "de", name: "German" },
 ];
+
 
 function TRANSLATOR() {
     const [text, setText] = useState("");
